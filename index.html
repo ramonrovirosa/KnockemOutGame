@@ -1,0 +1,112 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>CS 48 - Game</title>
+    <!-- 
+    //easel.js is a javascript library that handles loading sprites and creating bitmap images.
+    //Game.js initializes the splashscreen, sets up the background, and handles keystrokes.
+    //Controller.js is the main class. It is where objects are created, and adds a listener to check for keyboard input.
+    //Charecter.js is the parent class to classes: Hero and Boss(actually Enemy class)
+    //Hero.js subclass of charecter defines hero and handles traits.
+    //Boss.js subclass of charecter defines enemy attributes.
+    //Level.js still under work defines each levels attributes. Will become more important as more levels are created.
+    //Beginner.js defines charecteristics for beginner game.Less difficulty, to be implemented later.
+    //Intermediate.js defines charecteristics for intermediate game difficulty, to be implemented later.
+    //Advanced.js defines charecteristics for advanced game difficulty, possibly multiple enemies, to be implemented later. 
+    -->
+	<script type="text/javascript">
+	    var game;
+	    var gameCanvas;
+	    var audioIsPlaying = true;
+	    var menuMusic = true;
+
+	</script>
+	<script type="text/javascript" src="./lib/easel.js"></script>
+    <script type="text/javascript" src="./lib/jquery-1.4.4.min.js"></script>
+    <script type="text/javascript" src="./src/Game.js"></script>
+    <script type="text/javascript" src="./src/Controller.js"></script>
+    <script type="text/javascript" src="./src/Character.js"></script>
+    <script type="text/javascript" src="./src/Hero.js"></script>
+    <script type="text/javascript" src="./src/Boss.js"></script>
+    <script type="text/javascript" src="./src/Level.js"></script>
+    <script type="text/javascript" src="./src/Beginner.js"></script>
+    <script type="text/javascript" src="./src/Intermediate.js"></script>
+    <script type="text/javascript" src="./src/Advanced.js"></script>
+    <script type="text/javascript" src="./src/HealthBar.js"></script>
+    <script type="text/javascript" src="./src/droneBoss.js"></script>
+    <script type="text/javascript" src="./src/GuyBoss.js"></script>
+    <script type="text/javascript" src="./src/levelFour.js"></script>
+    <script type="text/javascript" src="./src/levelFive.js"></script>
+    <script type="text/javascript" src="./src/levelSix.js"></script>
+	<script>
+
+	    function handleAudioToggle() {
+
+	        // In the case where audio is playing...
+	        if (audioIsPlaying) {
+	            // Stop playing all audio
+	            document.getElementById('menumusic').pause();
+	            document.getElementById('levelmusic').pause();
+	            // Also change the audiotoggle button's icon
+	            document.getElementById('audiotoggle').src = "./img/Audio_On.jpg";
+	            // Indicate that audio has now stopped playing
+	            audioIsPlaying = false;
+	        }
+
+	        else {
+	            // Change the audiotoggle button's icon
+	            document.getElementById('audiotoggle').src = "./img/Audio_Off.jpg";
+	            // Check which music, then turn the right one on
+	            if (menuMusic)
+	                document.getElementById('menumusic').play();
+	            if (!menuMusic) // If it's not the menu music, it must be the level music
+	                document.getElementById('levelmusic').play();
+	            // Indicate that audio is now playing
+	            audioIsPlaying = true;
+	        }
+
+	    }
+
+	    function init() {
+	        gameCanvas = document.getElementById("gameCanvas");
+	        game = new Game(gameCanvas);
+	        eventHandler();
+	    }
+	    function eventHandler() {
+	        c = document.getElementById("#BtnImgStart");
+	        c = $("#BtnImgStart");
+
+	        c.click(function () {
+	            document.getElementById('menumusic').pause();
+	            if (audioIsPlaying)
+	                document.getElementById('levelmusic').play();
+	            game.start();
+	            $("#BtnImgStart").hide();
+	            menuMusic = false;
+	        });
+
+	    }
+
+
+
+</script>
+</head>
+
+<!--init() initializes game sequences by creating a canvas, creating a game object.-->
+<body onload="init();">
+    <!--startGame() essentially loads the splashscreen-->
+	
+	<canvas id="gameCanvas" width="1024" height="638" style="background-color: #000000">
+	</canvas>
+	<img id="audiotoggle" src="./img/Audio_Off.jpg" onclick="handleAudioToggle();"> </img>
+	
+	<audio id = "levelmusic" src="./music/CiderTime.ogg" loop="loop"></audio>	
+	<audio id = "menumusic" src="./music/menumusic.ogg" loop="loop"></audio>
+	
+	<script type="text/javascript"> document.getElementById('menumusic').play();</script>
+
+	<img id="BtnImgStart" style="position:absolute; cursor:pointer; left:8px; top:8px; float=left;" src="./img/menuscreen.png" />
+	
+</body>
+</html>

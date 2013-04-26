@@ -1,0 +1,244 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>EaselJS sprite sheet</title>
+<script language ="javascript" src="./lib/easel.js"></script>
+<script>
+var canvas;
+var stage;
+var bossImage = new Image();
+var img=new Image();
+var bmpSeq;
+var lfHeld;
+var rtHeld;
+var dwnHeld;
+var dHeld;
+var aHeld;
+var keyDn=false;
+var bgImage;
+var upHeld;
+var logo;
+var goingDown = 0;
+var d;
+
+
+document.onkeydown=handleKeyDown;
+document.onkeyup=handleKeyUp;
+
+
+function startGame(){
+        bgImage= new Image();
+        bgImage.src="./img/bgImage.png";
+        bgImage.onload = setbgImage;
+        
+	    bossImage.onload = handleBossImageLoad;
+	    bossImage.src = "./img/droneboss_idle1.png";
+	    //canvas.onclick = handleClick();
+
+	    img.onload = handleImageLoad;
+	    img.src = "./img/hero_spritesheet_complete.png";
+}
+
+function handleClick(){
+	stage.onclick = null;
+	stage.removeChild(gameTxt);
+	play = true;
+	stage.update();
+}
+
+function init() {
+	canvas = document.getElementById("canvas");
+	stage = new Stage(canvas);
+
+	gameTxt = new Text("Are You Ready For The Adventure of Your Life? \n \n Click if You Dare", "36px Arial", "#FFF");
+	gameTxt.textAlign = "center";
+	gameTxt.x = canvas.width/2;
+	gameTxt.y = canvas.height/3;
+	stage.addChild(gameTxt);
+	stage.update();
+}
+
+function setbgImage(event)
+{
+    logo = new Bitmap(bgImage);
+    
+    stage.addChild(logo);
+    logo.x=0;
+    logo.y= 0;
+    
+    Ticker.addListener(window);
+
+}
+
+function handleImageLoad(e) {
+	var frameData = {
+		punchRight:[0,8, "punchRight"],//used D Button case 68
+                kickRight:[12,15],
+		duckRight:[24,32],
+                jumpRight:[36,45, "jumpRight"],
+                wkRight:[48,59,"wkRight"],
+                idleRight:[60,60, "idleRight"],
+                idleDuck:[13,13, "idleDuck"]
+            };
+
+	var spriteSheet = new SpriteSheet(img,195,100,frameData);
+	spriteSheet = SpriteSheetUtils.flip(spriteSheet,
+		{
+			punchLeft:["punchRight",true,false, "punchLeft"],
+                        wkLeft:["wkRight",true, false,"wkLeft"],
+                        idleLeft:["idleRight", true, false, "idleLeft"],
+                        idleDuckLeft:["idleDuck",true,false,"idleDuckLeft"],
+                        jumpLeft:["jumpRight", true, false, "jumpLeft"]
+		});
+	bmpSeq = new BitmapSequence(spriteSheet);
+
+	bmpSeq.regX = 0;//bmpSeq.spriteSheet.frameWidth;
+	bmpSeq.regY = bmpSeq.spriteSheet.frameHeight;
+	bmpSeq.gotoAndStop("idleRight");
+
+	bmpSeq.x = 5;
+	bmpSeq.y = canvas.height;
+
+	stage.addChild(bmpSeq);
+	Ticker.addListener(window);
+
+}
+
+function handleBossImageLoad(e) {    
+    var frameData = {
+        bossIdle: [0, 0, "bossIdle"] //used D Button case 68
+     
+    };
+
+    var spriteSheet = new SpriteSheet(bossImage, 1000, 800, frameData);
+    
+    BossBmpSeq = new BitmapSequence(spriteSheet);
+
+    BossBmpSeq.regX = 0; //bmpSeq.spriteSheet.frameWidth;
+    BossBmpSeq.regY = BossBmpSeq.spriteSheet.frameHeight;
+    BossBmpSeq.gotoAndStop("bossIdle");
+    BossBmpSeq.gotoAndPlay("bossIdle");
+
+    BossBmpSeq.x = 200;
+    BossBmpSeq.y = canvas.height;
+
+    stage.addChild(BossBmpSeq);
+    Ticker.addListener(window);
+    
+}
+
+
+function tick(){
+    var speedControl = Ticker.getTicks() % 3;
+
+    if (speedControl == 0) {
+
+        if(dHeld && !keyDn){
+            bmpSeq.gotoAndPlay("punchRight");
+            keyDn=true;
+        }
+
+        if(aHeld && !keyDn){
+               bmpSeq.gotoAndPlay("punchLeft");
+               keyDn=true;
+        }
+        if(lfHeld){
+		bmpSeq.x-=10;
+	}
+	if(rtHeld){
+		bmpSeq.x+=10;
+        }
+
+        if(upHeld && goingDown<=5){
+            
+            bmpSeq.y-=10;
+            //alert(goingDown);
+            goingDown++;
+            if(goingDown==6){goingDown=12;}
+        }
+
+        if(upHeld && goingDown>6){
+           //if(goingDown==12){bmpSeq+=10;}
+
+            bmpSeq.y+=12;
+            //alert(goingDown);
+            goingDown--;
+            if(goingDown==7){goingDown=0;}
+        }
+
+        if(!upHeld){
+            bmpSeq.y = canvas.height+1;
+            goingDown=0;
+        }
+
+	if(lfHeld && !keyDn){
+		bmpSeq.gotoAndPlay("wkLeft");
+		keyDn=true;
+	}
+	if(rtHeld && !keyDn){
+		bmpSeq.gotoAndPlay("wkRight");
+		keyDn=true;
+	}
+
+        if(dwnHeld && !keyDn){
+		bmpSeq.gotoAndPlay("idleDuck");
+		keyDn=true;
+                
+	}
+
+
+        if(upHeld && !keyDn){
+		bmpSeq.gotoAndPlay("jumpRight");
+		keyDn=true;
+	}
+
+        
+	stage.update();
+        
+    }
+}
+
+
+function handleKeyDown(e) {
+	if(!e){ var e = window.event; }
+            switch(e.keyCode) {
+		case 68:        dHeld = true; break;
+                case 65:        aHeld = true; break;
+                case 37:	lfHeld = true; break;
+		case 39: 	rtHeld = true; break;
+                case 40:	dwnHeld = true; break;
+                case 38:        upHeld = true; break;
+                
+
+
+	}
+}
+function handleKeyUp(e) {
+	if(!e){ var e = window.event; }
+        
+	switch(e.keyCode) {
+		case 68: 	bmpSeq.gotoAndStop("punchRight");bmpSeq.gotoAndStop("idleRight");keyDn=false;dHeld = false; break;
+                case 65:        bmpSeq.gotoAndStop("punchLeft");bmpSeq.gotoAndStop("idleLeft");keyDn=false;aHeld = false; break;
+                case 37:	bmpSeq.gotoAndStop("wkLeft");bmpSeq.gotoAndStop("idleLeft");keyDn=false;lfHeld = false; break;
+		case 39: 	bmpSeq.gotoAndStop("wkRight"); bmpSeq.gotoAndStop("idleRight");keyDn=false;rtHeld = false; break;
+                case 40:	bmpSeq.gotoAndStop("idleDuck"); bmpSeq.gotoAndStop("idleRight");keyDn=false;dwnHeld = false; break;
+                case 38:	bmpSeq.gotoAndStop("jumpRight"); bmpSeq.gotoAndStop("idleRight");keyDn=false;upHeld = false; break;
+
+
+	}
+        
+}
+
+</script>
+</head>
+
+<body onload="init();">
+		<canvas  onclick = "startGame();" id="canvas" width="1024" height="638" style="background-color:#000000"></canvas>
+
+                <audio autoplay="autoplay" controls="controls" loop="loop" height="1" width="1"><source src="./music/FireFlames.ogg" type="audio/ogg" /><source src="./music/FireFlames.mp3" type="audio/mp3" /></audio>
+
+               
+</body>
+
+</html>

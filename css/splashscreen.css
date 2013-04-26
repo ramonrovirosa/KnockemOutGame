@@ -1,0 +1,14 @@
+#splashScreen img{
+02	    margin:0 auto;
+03	}
+04
+05	#splashScreen{
+06	    position:absolute;
+07	    top:0;
+08	    left:0;
+09	    height:100%;
+10	    width:100%;
+11	    background-color:#252525;
+12	    background-repeat:no-repeat;
+13	    text-align:center;
+14	}
